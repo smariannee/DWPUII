@@ -1,11 +1,15 @@
 <script setup>
+import Books from "./modules/books/views/Books.vue"
+components: { Books }
 </script>
 
 <template>
   <div id="app">
     <header></header>
 
-    <main></main>
+    <main>
+      <Books/>
+    </main>
   </div>
 </template>
 
