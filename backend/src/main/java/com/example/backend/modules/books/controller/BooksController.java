@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/books")
 @CrossOrigin(origins = {"*"})
@@ -37,14 +39,9 @@ public class BooksController {
         return new ResponseEntity<>(responseApi, responseApi.getStatus());
     }
 
-    @GetMapping("/paged")
-    public ResponseEntity<ResponseApi<Page<Book>>> getAll (
-            @RequestParam(defaultValue = "0", required = false) int page,
-            @RequestParam(defaultValue = "10", required = false) int size,
-            @RequestParam(defaultValue = "id", required = false) String sort,
-            @RequestParam(defaultValue = "asc", required = false) String direction){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(direction), sort));
-        ResponseApi<Page<Book>> responseApi = bookService.getPaged(pageable);
+    @GetMapping("/getAll")
+    public ResponseEntity<ResponseApi<List<Book>>> getAll (){
+        ResponseApi<List<Book>> responseApi = bookService.getAll();
         return new ResponseEntity<>(responseApi, responseApi.getStatus());
     }
     @GetMapping("/")
