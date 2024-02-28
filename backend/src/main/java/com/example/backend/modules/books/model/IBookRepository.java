@@ -15,4 +15,6 @@ public interface IBookRepository extends JpaRepository<Book, Long> {
     List<Book> getAllOrderedByAutor();
     @Query(value = "select * from books order by release_date asc", nativeQuery = true)
     List<Book> getAllOrderedByReleaseDate();
+    @Query(value = "SELECT b FROM Book b WHERE b.img IS NOT NULL")
+    List<Book> getAllWithImage();
 }
