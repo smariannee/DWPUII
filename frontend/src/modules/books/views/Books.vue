@@ -4,35 +4,18 @@
             <b-row ref="carousel">
                 <b-col cols="12" class="px-0" v-show="showCarousel">
                     <b-carousel id="carousel-1" v-model="slide" :interval="4000" controls indicators background="#ababab"
-                        img-width="1024" img-height="480" style="text-shadow: 1px 1px 2px #333;">
-                        <!-- Text slides with image -->
-                        <b-carousel-slide caption="First slide"
-                            text="Nulla vitae elit libero, a pharetra augue mollis interdum."
-                            img-src="https://picsum.photos/1024/480/?image=52"></b-carousel-slide>
-
-                        <!-- Slides with custom text -->
-                        <b-carousel-slide img-src="https://picsum.photos/1024/480/?image=54">
-                            <h1>Hello world!</h1>
-                        </b-carousel-slide>
-
-                        <!-- Slides with image only -->
-                        <b-carousel-slide img-src="https://picsum.photos/1024/480/?image=58"></b-carousel-slide>
-
-                        <!-- Slides with img slot -->
-                        <!-- Note the classes .d-block and .img-fluid to prevent browser default image alignment -->
-                        <b-carousel-slide>
+                        style="text-shadow: 1px 1px 2px #333; border-radius: 10px;">
+                        <b-carousel-slide v-for="(book, index) in booksWithImages" :key="index">
                             <template #img>
-                                <img class="d-block img-fluid w-100" width="1024" height="480"
-                                    src="https://picsum.photos/1024/480/?image=55" alt="image slot">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <b-img :src="book.img" fluid alt="Imagen del libro"
+                                        style="height: 400px; width: auto;"></b-img>
+                                </div>
                             </template>
-                        </b-carousel-slide>
-
-                        <!-- Slide with blank fluid image to maintain slide aspect ratio -->
-                        <b-carousel-slide caption="Blank Image" img-blank img-alt="Blank image">
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eros felis, tincidunt
-                                a tincidunt eget, convallis vel est. Ut pellentesque ut lacus vel interdum.
-                            </p>
+                            <div class="carousel-caption">
+                                <h3 class="text-white">{{ book.name }}</h3>
+                                <p class="text-white">{{ book.autor }}</p>
+                            </div>
                         </b-carousel-slide>
                     </b-carousel>
                 </b-col>
@@ -68,7 +51,8 @@
                                     <hr>
                                     <div class="d-flex justify-content-center align-items-center">
                                         <b-card-img v-show="book.img" :src="book.img" class="img my-2"
-                                            alt="Imagen del libro" style="height: 180px; width: 100%;" fluid rounded center></b-card-img>
+                                            alt="Imagen del libro" style="height: 180px; width: 100%;" fluid rounded
+                                            center></b-card-img>
                                     </div>
                                     <template #footer>
                                         <p class="mb-0">
@@ -227,14 +211,14 @@ export default {
                 img: ''
             },
             books: [{}],
-            onSlideStart: null,
-            onSlideEnd: null
+            bookImages: []
         }
     },
     methods: {
         getBooks() {
             instance.post('/books/getAll', this.orderBooksDto).then(response => {
                 this.books = response.data.data
+                this.bookImages = this.books.filter(book => book.img)
             })
                 .catch(error => {
                     console.log(error)
@@ -369,6 +353,11 @@ export default {
     },
     beforeDestroy() {
         window.removeEventListener("scroll", this.handleScroll);
+    },
+    computed: {
+        booksWithImages() {
+            return this.books.filter(book => !!book.img)
+        }
     }
 }
 </script>
@@ -378,5 +367,22 @@ export default {
     width: 300px;
     height: 200px;
     object-fit: contain;
+}
+
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.carousel-caption h3 {
+    font-size: 24px;
+}
+
+.carousel-caption p {
+    font-size: 18px;
 }
 </style>
