@@ -21,7 +21,7 @@
                 </b-col>
                 <b-col cols="12" sm="4" class="d-flex justify-content-center align-items-center p-3">
                     <b-button variant="info">
-                        <span>Películas con imagen</span>
+                        <span>Libros con imagen</span>
                         <b-icon icon="camera" class="ms-2"></b-icon>
                     </b-button>
                 </b-col>
@@ -29,13 +29,13 @@
             <b-row>
                 <b-col cols="9">
                     <b-row>
-                        <b-col cols="12" sm="6" md="4">
-                            <b-card title="Título de la película" style="max-width: 20rem;">
-                                <b-card-sub-title class="mb-2 text-muted">Autor del libro</b-card-sub-title>
+                        <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
+                            <b-card draggable="true" @dragstart="form.id = book.id" :title="book.name" style="max-width: 20rem;">
+                                <b-card-sub-title class="mb-2 text-muted">{{book.autor}}</b-card-sub-title>
                                 <template #footer>
                                     <p class="mb-0">
                                         <b-icon icon="calendar"></b-icon>
-                                        Año de publicación: <strong>20/12/2024</strong>
+                                        Año de publicación: <strong>{{book.releaseDate}}</strong>
                                     </p>
                                 </template>
                             </b-card>
@@ -46,19 +46,19 @@
                     <b-row>
                         <b-col cols="12" class="px-5">
                             <b-button variant="success" class="w-100 py-3" v-b-modal.modal-register>
-                                <span>Añadir película</span>
+                                <span>Añadir libro</span>
                                 <b-icon icon="plus-circle" class="ms-2"></b-icon>
                             </b-button>
                         </b-col>
                         <b-col cols="12" class="px-5 mt-4">
                             <b-button variant="warning" class="w-100 py-3">
-                                <span>Editar película</span>
+                                <span>Editar libro</span>
                                 <b-icon icon="pencil" class="ms-2"></b-icon>
                             </b-button>
                         </b-col>
-                        <b-col cols="12" class="px-5 mt-4">
+                        <b-col cols="12" class="px-5 mt-4 drag-container" @dragover.prevent @drop="handleDropDelete">
                             <b-button variant="danger" class="w-100 py-3">
-                                <span>Eliminar película</span>
+                                <span>Eliminar libro</span>
                                 <b-icon icon="trash" class="ms-2"></b-icon>
                             </b-button>
                         </b-col>
@@ -74,23 +74,23 @@
                         <hr>
                     </b-col>
                     <b-col cols="12" class="mt-3">
-                        <b-form-group label="Título de la película:" label-for="title">
-                            <b-form-input id="title" v-model="title" required></b-form-input>
+                        <b-form-group label="Título del libro:" label-for="title">
+                            <b-form-input id="title" v-model="form.name" required></b-form-input>
                         </b-form-group>
                     </b-col>
                     <b-col cols="12" class="mt-3">
-                        <b-form-group label="Autor de la película:" label-for="author">
-                            <b-form-input id="author" v-model="author" required></b-form-input>
+                        <b-form-group label="Autor del libro:" label-for="author">
+                            <b-form-input id="author" v-model="form.autor" required></b-form-input>
                         </b-form-group>
                     </b-col>
                     <b-col cols="12" class="mt-3">
                         <b-form-group label="Año de publicación:" label-for="year">
-                            <b-form-input id="year" v-model="year" type="number" required></b-form-input>
+                            <b-form-input id="year" v-model="form.releaseDate" type="number" required></b-form-input>
                         </b-form-group>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
-                        <b-button type="submit" variant="primary" class="d-flex align-items-center justify-content-center" style="width: 90%;">
-                            <span>Registrar película</span>
+                        <b-button @click="saveBook()" variant="primary" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                            <span>Registrar libro</span>
                             <b-icon icon="plus-circle" class="ms-2"></b-icon>
                         </b-button>
                     </b-col>
@@ -107,11 +107,19 @@
 </template>
 
 <script>
+import instance from '../../../config/axios'
 export default {
     data() {
         return {
             slide: 0,
-            sliding: null
+            sliding: null,
+            form:{
+                id:null,
+                name:'',
+                autor:'',
+                releaseDate:'',
+            },
+            books: [{}],
         }
     },
     methods: {
@@ -120,7 +128,48 @@ export default {
         },
         onSlideEnd(slide) {
             this.sliding = false
+        },
+        getBooks(){ 
+            instance.get('/books/getAll').then(response => {
+                    this.books = response.data.data
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+        },
+        deleteBook(){
+            instance.delete('/books/'+this.form.id).then(response => {
+                this.getBooks()
+                this.resetForm()
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        },
+        handleDropDelete(event){
+            event.preventDefault();
+            this.deleteBook(this.form.id)
+        },
+        saveBook(){
+            instance.post('/books/', this.form).then(response => {
+                this.getBooks()
+                this.resetForm()
+                //cerrar modal
+                this.$bvModal.hide('modal-register')
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        },
+        resetForm(){
+            this.form.id = null
+            this.form.name = ''
+            this.form.autor = ''
+            this.form.releaseDate = ''
         }
+    },
+    mounted(){
+        this.getBooks()
     }
 }
 </script>
