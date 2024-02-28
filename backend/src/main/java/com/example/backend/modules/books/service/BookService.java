@@ -66,7 +66,14 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseApi<List<Book>> getAll(){
-        return new ResponseApi<>(iBookRepository.getAll(), HttpStatus.OK, false, "Books found successfully");
+    public ResponseApi<List<Book>> getAll(String value){
+        switch (value) {
+            case "autor":
+                return new ResponseApi<>(iBookRepository.getAllOrderedByAutor(), HttpStatus.OK, false, "Books ordered by author found successfully");
+            case "year":
+                return new ResponseApi<>(iBookRepository.getAllOrderedByReleaseDate(), HttpStatus.OK, false, "Books ordered by release date found successfully");
+            default:
+                return new ResponseApi<>(iBookRepository.getAll(), HttpStatus.OK, false, "Books found successfully");
+        }
     }
 }

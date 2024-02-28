@@ -11,4 +11,8 @@ import java.util.List;
 public interface IBookRepository extends JpaRepository<Book, Long> {
     @Query(value = "select * from books", nativeQuery = true)
     List<Book> getAll();
+    @Query(value = "select * from books order by autor asc", nativeQuery = true)
+    List<Book> getAllOrderedByAutor();
+    @Query(value = "select * from books order by release_date asc", nativeQuery = true)
+    List<Book> getAllOrderedByReleaseDate();
 }

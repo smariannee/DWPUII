@@ -3,12 +3,9 @@ package com.example.backend.modules.books.controller;
 import com.example.backend.kernel.ResponseApi;
 import com.example.backend.modules.books.model.Book;
 import com.example.backend.modules.books.model.BookDto;
+import com.example.backend.modules.books.model.OrderBooksDto;
 import com.example.backend.modules.books.service.BookService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +36,9 @@ public class BooksController {
         return new ResponseEntity<>(responseApi, responseApi.getStatus());
     }
 
-    @GetMapping("/getAll")
-    public ResponseEntity<ResponseApi<List<Book>>> getAll (){
-        ResponseApi<List<Book>> responseApi = bookService.getAll();
+    @PostMapping("/getAll")
+    public ResponseEntity<ResponseApi<List<Book>>> getAll (@RequestBody OrderBooksDto dto){
+        ResponseApi<List<Book>> responseApi = bookService.getAll(dto.getValue());
         return new ResponseEntity<>(responseApi, responseApi.getStatus());
     }
     @GetMapping("/")
