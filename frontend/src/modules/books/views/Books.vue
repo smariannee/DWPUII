@@ -1,9 +1,41 @@
 <template>
     <div>
         <b-container fluid>
-            <b-row>
-                <b-col cols="12" style="background-color: gray;">
-                    <p>espacio para carrusel</p>
+            <b-row ref="carousel">
+                <b-col cols="12" class="px-0" v-show="showCarousel">
+                    <b-carousel id="carousel-1" v-model="slide" :interval="4000" controls indicators background="#ababab"
+                        img-width="1024" img-height="480" style="text-shadow: 1px 1px 2px #333;"
+                        @sliding-start="onSlideStart" @sliding-end="onSlideEnd">
+                        <!-- Text slides with image -->
+                        <b-carousel-slide caption="First slide"
+                            text="Nulla vitae elit libero, a pharetra augue mollis interdum."
+                            img-src="https://picsum.photos/1024/480/?image=52"></b-carousel-slide>
+
+                        <!-- Slides with custom text -->
+                        <b-carousel-slide img-src="https://picsum.photos/1024/480/?image=54">
+                            <h1>Hello world!</h1>
+                        </b-carousel-slide>
+
+                        <!-- Slides with image only -->
+                        <b-carousel-slide img-src="https://picsum.photos/1024/480/?image=58"></b-carousel-slide>
+
+                        <!-- Slides with img slot -->
+                        <!-- Note the classes .d-block and .img-fluid to prevent browser default image alignment -->
+                        <b-carousel-slide>
+                            <template #img>
+                                <img class="d-block img-fluid w-100" width="1024" height="480"
+                                    src="https://picsum.photos/1024/480/?image=55" alt="image slot">
+                            </template>
+                        </b-carousel-slide>
+
+                        <!-- Slide with blank fluid image to maintain slide aspect ratio -->
+                        <b-carousel-slide caption="Blank Image" img-blank img-alt="Blank image">
+                            <p>
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse eros felis, tincidunt
+                                a tincidunt eget, convallis vel est. Ut pellentesque ut lacus vel interdum.
+                            </p>
+                        </b-carousel-slide>
+                    </b-carousel>
                 </b-col>
             </b-row>
             <b-row>
@@ -31,8 +63,8 @@
                     <b-row>
                         <TransitionGroup name="fadeDown" tag="div" class="row">
                             <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
-                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)" :title="book.name"
-                                    style="max-width: 20rem;">
+                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
+                                    :title="book.name" style="height: 20rem;">
                                     <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
                                     <template #footer>
                                         <p class="mb-0">
@@ -69,6 +101,7 @@
                 </b-col>
             </b-row>
         </b-container>
+
         <b-modal id="modal-register" size="md" hide-footer hide-header>
             <b-form>
                 <b-row>
@@ -157,7 +190,7 @@ export default {
     data() {
         return {
             slide: 0,
-            sliding: null,
+            showCarousel: true,
             orderBooksDto: {
                 value: ''
             },
@@ -177,12 +210,6 @@ export default {
         }
     },
     methods: {
-        onSlideStart(slide) {
-            this.sliding = true
-        },
-        onSlideEnd(slide) {
-            this.sliding = false
-        },
         getBooks() {
             instance.post('/books/getAll', this.orderBooksDto).then(response => {
                 this.books = response.data.data
@@ -244,13 +271,27 @@ export default {
             this.$bvModal.hide('modal-update')
             this.resetForm()
         },
-        applyFilter(filterBy){
+        applyFilter(filterBy) {
             this.orderBooksDto.value = filterBy
             this.getBooks()
+        },
+        handleScroll() {
+            let componentHeight = this.$refs.carousel.clientHeight;
+            const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (currentScrollPosition > (componentHeight + 2) && this.showCarousel) {
+                this.showCarousel = false;
+            } else if (currentScrollPosition < (componentHeight + 2) && !this.showCarousel) {
+                this.showCarousel = true;
+            }
         }
     },
     mounted() {
+        window.addEventListener("scroll", this.handleScroll);
         this.getBooks()
+    },
+    beforeDestroy() {
+        window.removeEventListener("scroll", this.handleScroll);
     }
 }
 </script>
