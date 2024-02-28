@@ -46,7 +46,7 @@
                         <TransitionGroup name="fadeDown" tag="div" class="row">
                             <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
                                 <b-card :key="book.id" draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
-                                    :title="book.name" style="height: 20rem;">
+                                    :title="book.name" style="height: 22.5rem;">
                                     <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
                                     <hr>
                                     <div class="d-flex justify-content-center align-items-center">
