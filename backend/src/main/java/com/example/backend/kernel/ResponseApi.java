@@ -1,9 +1,11 @@
 package com.example.backend.kernel;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
+@Data
 public class ResponseApi<T> {
     private T data;
     private HttpStatus status;
