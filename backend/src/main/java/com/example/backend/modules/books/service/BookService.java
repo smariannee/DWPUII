@@ -72,6 +72,8 @@ public class BookService {
                 return new ResponseApi<>(iBookRepository.getAllOrderedByAutor(), HttpStatus.OK, false, "Books ordered by author found successfully");
             case "year":
                 return new ResponseApi<>(iBookRepository.getAllOrderedByReleaseDate(), HttpStatus.OK, false, "Books ordered by release date found successfully");
+            case "img":
+                return new ResponseApi<>(iBookRepository.getAllWithImage(), HttpStatus.OK, false, "Books with image found successfully");
             default:
                 return new ResponseApi<>(iBookRepository.getAll(), HttpStatus.OK, false, "Books found successfully");
         }
