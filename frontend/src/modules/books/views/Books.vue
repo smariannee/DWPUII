@@ -29,17 +29,20 @@
             <b-row>
                 <b-col cols="9">
                     <b-row>
-                        <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
-                            <b-card draggable="true" @dragstart="form=book" :title="book.name" style="max-width: 20rem;">
-                                <b-card-sub-title class="mb-2 text-muted">{{book.autor}}</b-card-sub-title>
-                                <template #footer>
-                                    <p class="mb-0">
-                                        <b-icon icon="calendar"></b-icon>
-                                        Año de publicación: <strong>{{book.releaseDate}}</strong>
-                                    </p>
-                                </template>
-                            </b-card>
-                        </b-col>
+                        <TransitionGroup name="fadeDown" tag="div" class="row">
+                            <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
+                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)" :title="book.name"
+                                    style="max-width: 20rem;">
+                                    <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
+                                    <template #footer>
+                                        <p class="mb-0">
+                                            <b-icon icon="calendar"></b-icon>
+                                            Año de publicación: <strong>{{ book.releaseDate }}</strong>
+                                        </p>
+                                    </template>
+                                </b-card>
+                            </b-col>
+                        </TransitionGroup>
                     </b-row>
                 </b-col>
                 <b-col cols="3" class="d-flex align-items-center">
@@ -89,13 +92,15 @@
                         </b-form-group>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
-                        <b-button @click="saveBook()" variant="primary" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                        <b-button @click="saveBook()" variant="primary"
+                            class="d-flex align-items-center justify-content-center" style="width: 90%;">
                             <span>Registrar libro</span>
                             <b-icon icon="plus-circle" class="ms-2"></b-icon>
                         </b-button>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
-                        <b-button @click="closeModals()" type="reset" variant="danger" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                        <b-button @click="closeModals()" type="reset" variant="danger"
+                            class="d-flex align-items-center justify-content-center" style="width: 90%;">
                             <span>Cancelar</span>
                             <b-icon icon="x-circle" class="ms-2"></b-icon>
                         </b-button>
@@ -127,13 +132,15 @@
                         </b-form-group>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
-                        <b-button @click="updateBook()" variant="primary" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                        <b-button @click="updateBook()" variant="primary"
+                            class="d-flex align-items-center justify-content-center" style="width: 90%;">
                             <span>Actualizar libro</span>
                             <b-icon icon="plus-circle" class="ms-2"></b-icon>
                         </b-button>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
-                        <b-button @click="closeModals()" type="reset" variant="danger" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                        <b-button @click="closeModals()" type="reset" variant="danger"
+                            class="d-flex align-items-center justify-content-center" style="width: 90%;">
                             <span>Cancelar</span>
                             <b-icon icon="x-circle" class="ms-2"></b-icon>
                         </b-button>
@@ -151,20 +158,20 @@ export default {
         return {
             slide: 0,
             sliding: null,
-            orderBooksDto:{
-                value:''
+            orderBooksDto: {
+                value: ''
             },
-            form:{
-                id:null,
-                name:'',
-                autor:'',
-                releaseDate:'',
+            form: {
+                id: null,
+                name: '',
+                autor: '',
+                releaseDate: '',
             },
-            formUpdate:{
-                id:null,
-                name:'',
-                autor:'',
-                releaseDate:'',
+            formUpdate: {
+                id: null,
+                name: '',
+                autor: '',
+                releaseDate: '',
             },
             books: [{}],
         }
@@ -176,52 +183,52 @@ export default {
         onSlideEnd(slide) {
             this.sliding = false
         },
-        getBooks(){ 
-            instance.post('/books/getAll',this.orderBooksDto).then(response => {
-                    this.books = response.data.data
-                })
+        getBooks() {
+            instance.post('/books/getAll', this.orderBooksDto).then(response => {
+                this.books = response.data.data
+            })
                 .catch(error => {
                     console.log(error)
                 })
         },
-        deleteBook(){
-            instance.delete('/books/'+this.form.id).then(response => {
+        deleteBook() {
+            instance.delete('/books/' + this.formUpdate.id).then(response => {
                 this.getBooks()
                 this.resetForm()
             })
-            .catch(error => {
-                console.log(error)
-            })
+                .catch(error => {
+                    console.log(error)
+                })
         },
-        handleDropDelete(event){
+        handleDropDelete(event) {
             event.preventDefault();
             this.deleteBook()
         },
-        handleDropUpdate(event){
+        handleDropUpdate(event) {
             event.preventDefault();
             this.$bvModal.show('modal-update')
         },
-        saveBook(){
+        saveBook() {
             instance.post('/books/', this.form).then(response => {
                 this.getBooks()
                 this.resetForm()
                 this.closeModals()
             })
-            .catch(error => {
-                console.log(error)
-            })
+                .catch(error => {
+                    console.log(error)
+                })
         },
-        updateBook(){
-            instance.put('/books/',this.form).then(response => {
+        updateBook() {
+            instance.put('/books/', this.formUpdate).then(response => {
                 this.getBooks()
                 this.resetForm()
                 this.closeModals()
             })
-            .catch(error => {
-                console.log(error)
-            })
+                .catch(error => {
+                    console.log(error)
+                })
         },
-        resetForm(){
+        resetForm() {
             this.form.id = null
             this.form.name = ''
             this.form.autor = ''
@@ -232,13 +239,13 @@ export default {
             this.formUpdate.autor = ''
             this.formUpdate.releaseDate = ''
         },
-        closeModals(){
+        closeModals() {
             this.$bvModal.hide('modal-register')
             this.$bvModal.hide('modal-update')
             this.resetForm()
         }
     },
-    mounted(){
+    mounted() {
         this.getBooks()
     }
 }
