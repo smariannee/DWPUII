@@ -30,7 +30,7 @@
                 <b-col cols="9">
                     <b-row>
                         <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
-                            <b-card draggable="true" @dragstart="form.id = book.id" :title="book.name" style="max-width: 20rem;">
+                            <b-card draggable="true" @dragstart="form=book" :title="book.name" style="max-width: 20rem;">
                                 <b-card-sub-title class="mb-2 text-muted">{{book.autor}}</b-card-sub-title>
                                 <template #footer>
                                     <p class="mb-0">
@@ -50,7 +50,7 @@
                                 <b-icon icon="plus-circle" class="ms-2"></b-icon>
                             </b-button>
                         </b-col>
-                        <b-col cols="12" class="px-5 mt-4">
+                        <b-col cols="12" class="px-5 mt-4 drag-container" @dragover.prevent @drop="handleDropUpdate">
                             <b-button variant="warning" class="w-100 py-3">
                                 <span>Editar libro</span>
                                 <b-icon icon="pencil" class="ms-2"></b-icon>
@@ -95,7 +95,45 @@
                         </b-button>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
-                        <b-button type="reset" variant="danger" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                        <b-button @click="closeModals()" type="reset" variant="danger" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                            <span>Cancelar</span>
+                            <b-icon icon="x-circle" class="ms-2"></b-icon>
+                        </b-button>
+                    </b-col>
+                </b-row>
+            </b-form>
+        </b-modal>
+
+        <b-modal id="modal-update" size="md" hide-footer hide-header>
+            <b-form>
+                <b-row>
+                    <b-col cols="12" class="text-center">
+                        <h4>Actualizar libro</h4>
+                        <hr>
+                    </b-col>
+                    <b-col cols="12" class="mt-3">
+                        <b-form-group label="Título del libro:" label-for="title">
+                            <b-form-input id="title" v-model="formUpdate.name" required></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col cols="12" class="mt-3">
+                        <b-form-group label="Autor del libro:" label-for="author">
+                            <b-form-input id="author" v-model="formUpdate.autor" required></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col cols="12" class="mt-3">
+                        <b-form-group label="Año de publicación:" label-for="year">
+                            <b-form-input id="year" v-model="formUpdate.releaseDate" type="number" required></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
+                        <b-button @click="updateBook()" variant="primary" class="d-flex align-items-center justify-content-center" style="width: 90%;">
+                            <span>Actualizar libro</span>
+                            <b-icon icon="plus-circle" class="ms-2"></b-icon>
+                        </b-button>
+                    </b-col>
+                    <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
+                        <b-button @click="closeModals()" type="reset" variant="danger" class="d-flex align-items-center justify-content-center" style="width: 90%;">
                             <span>Cancelar</span>
                             <b-icon icon="x-circle" class="ms-2"></b-icon>
                         </b-button>
@@ -114,6 +152,12 @@ export default {
             slide: 0,
             sliding: null,
             form:{
+                id:null,
+                name:'',
+                autor:'',
+                releaseDate:'',
+            },
+            formUpdate:{
                 id:null,
                 name:'',
                 autor:'',
@@ -148,14 +192,27 @@ export default {
         },
         handleDropDelete(event){
             event.preventDefault();
-            this.deleteBook(this.form.id)
+            this.deleteBook()
+        },
+        handleDropUpdate(event){
+            event.preventDefault();
+            this.$bvModal.show('modal-update')
         },
         saveBook(){
             instance.post('/books/', this.form).then(response => {
                 this.getBooks()
                 this.resetForm()
-                //cerrar modal
-                this.$bvModal.hide('modal-register')
+                this.closeModals()
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        },
+        updateBook(){
+            instance.put('/books/',this.form).then(response => {
+                this.getBooks()
+                this.resetForm()
+                this.closeModals()
             })
             .catch(error => {
                 console.log(error)
@@ -166,6 +223,16 @@ export default {
             this.form.name = ''
             this.form.autor = ''
             this.form.releaseDate = ''
+
+            this.formUpdate.id = null
+            this.formUpdate.name = ''
+            this.formUpdate.autor = ''
+            this.formUpdate.releaseDate = ''
+        },
+        closeModals(){
+            this.$bvModal.hide('modal-register')
+            this.$bvModal.hide('modal-update')
+            this.resetForm()
         }
     },
     mounted(){
