@@ -34,9 +34,9 @@ public class BookService {
         return new ResponseApi<>(iBookRepository.saveAndFlush(book),HttpStatus.CREATED, false, "Book saved successfully");
     }
     @Transactional(rollbackFor = {SQLException.class, Exception.class})
-    public ResponseApi<?> delete (BookDto dto){
-        if(dto.getId() == null || dto.getId() <= 0) return new ResponseApi<>(HttpStatus.BAD_REQUEST, true, "The id cannot be empty or less than 1");
-        Optional<Book> book = iBookRepository.findById(dto.getId());
+    public ResponseApi<?> delete (Long id){
+        if(id == null || id <= 0) return new ResponseApi<>(HttpStatus.BAD_REQUEST, true, "The id cannot be empty or less than 1");
+        Optional<Book> book = iBookRepository.findById(id);
         if(book.isEmpty()) return new ResponseApi<>(HttpStatus.NOT_FOUND, true, "Book not found");
         iBookRepository.delete(book.get());
         return new ResponseApi<>(HttpStatus.OK, false, "Book deleted successfully");

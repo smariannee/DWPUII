@@ -24,9 +24,9 @@ public class BooksController {
         ResponseApi<Book> responseApi = bookService.save(dto);
         return new ResponseEntity<>(responseApi, responseApi.getStatus());
     }
-    @DeleteMapping("/")
-    public ResponseEntity<ResponseApi<?>> delete (@Validated(BookDto.Delete.class) @RequestBody BookDto dto){
-        ResponseApi<?> responseApi = bookService.delete(dto);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseApi<?>> delete (@PathVariable Long id){
+        ResponseApi<?> responseApi = bookService.delete(id);
         return new ResponseEntity<>(responseApi, responseApi.getStatus());
     }
 
