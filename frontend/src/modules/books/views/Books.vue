@@ -20,8 +20,8 @@
                     </b-button>
                 </b-col>
                 <b-col cols="12" sm="4" class="d-flex justify-content-center align-items-center p-3">
-                    <b-button variant="info">
-                        <span>Libros con imagen</span>
+                    <b-button variant="info" @click="applyFilter('img')">
+                        <span>Libros con Imagen</span>
                         <b-icon icon="camera" class="ms-2"></b-icon>
                     </b-button>
                 </b-col>
@@ -31,9 +31,13 @@
                     <b-row>
                         <TransitionGroup name="fadeDown" tag="div" class="row">
                             <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
-                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)" :title="book.name"
-                                    style="max-width: 20rem;">
+                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
+                                    :title="book.name" :key="book.id" style="max-width: 20rem;">
                                     <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
+                                    <b-card-text v-show="book.img != ''">
+                                        <b-img :src="book.img" class="img" alt="Imagen del libro" fluid rounded
+                                            center></b-img>
+                                    </b-card-text>
                                     <template #footer>
                                         <p class="mb-0">
                                             <b-icon icon="calendar"></b-icon>
@@ -89,6 +93,12 @@
                     <b-col cols="12" class="mt-3">
                         <b-form-group label="Año de publicación:" label-for="year">
                             <b-form-input id="year" v-model="form.releaseDate" type="number" required></b-form-input>
+                        </b-form-group>
+                    </b-col>
+                    <b-col>
+                        <b-img :src="showImg()" class="img" alt="Imagen seleccionada" fluid rounded center></b-img>
+                        <b-form-group label="Imagen del libro:" label-for="img">
+                            <b-form-file id="img" v-model="form.image"></b-form-file>
                         </b-form-group>
                     </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
@@ -159,13 +169,15 @@ export default {
             slide: 0,
             sliding: null,
             orderBooksDto: {
-                value: ''
+                value: 'default'
             },
             form: {
                 id: null,
                 name: '',
                 autor: '',
                 releaseDate: '',
+                image: '',
+                img: ''
             },
             formUpdate: {
                 id: null,
@@ -209,14 +221,31 @@ export default {
             this.$bvModal.show('modal-update')
         },
         saveBook() {
-            instance.post('/books/', this.form).then(response => {
-                this.getBooks()
-                this.resetForm()
-                this.closeModals()
-            })
-                .catch(error => {
-                    console.log(error)
-                })
+            if (this.form.image) {
+                const reader = new FileReader()
+                reader.readAsDataURL(this.form.image)
+                reader.onloadend = () => {
+                    this.form.img = reader.result
+
+                    instance.post('/books/', this.form).then(response => {
+                        this.getBooks()
+                        this.resetForm()
+                        this.closeModals()
+                    })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }
+            }else{
+                instance.post('/books/', this.form).then(response => {
+                        this.getBooks()
+                        this.resetForm()
+                        this.closeModals()
+                    })
+                        .catch(error => {
+                            console.log(error)
+                        })
+            }
         },
         updateBook() {
             instance.put('/books/', this.formUpdate).then(response => {
@@ -233,6 +262,8 @@ export default {
             this.form.name = ''
             this.form.autor = ''
             this.form.releaseDate = ''
+            this.form.image = ''
+            this.form.img = ''
 
             this.formUpdate.id = null
             this.formUpdate.name = ''
@@ -244,9 +275,13 @@ export default {
             this.$bvModal.hide('modal-update')
             this.resetForm()
         },
-        applyFilter(filterBy){
+        applyFilter(filterBy) {
             this.orderBooksDto.value = filterBy
             this.getBooks()
+        },
+        showImg() {
+            if (this.form.image) return URL.createObjectURL(this.form.image)
+            return "https://cdn-icons-png.flaticon.com/512/1160/1160358.png"
         }
     },
     mounted() {
@@ -255,4 +290,10 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.img {
+    width: 300px;
+    height: 200px;
+    object-fit: contain;
+}
+</style>
