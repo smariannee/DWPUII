@@ -8,14 +8,14 @@
             </b-row>
             <b-row>
                 <b-col cols="12" sm="4" class="d-flex justify-content-center align-items-center p-3">
-                    <b-button variant="info">
-                        <span>Ordenar por autor</span>
+                    <b-button variant="info" @click="applyFilter('autor')">
+                        <span>Ordenar por Autor</span>
                         <b-icon icon="person" class="ms-2"></b-icon>
                     </b-button>
                 </b-col>
                 <b-col cols="12" sm="4" class="d-flex justify-content-center align-items-center p-3">
-                    <b-button variant="info">
-                        <span>Ordenar por fecha</span>
+                    <b-button variant="info" @click="applyFilter('year')">
+                        <span>Ordenar por Fecha</span>
                         <b-icon icon="calendar" class="ms-2"></b-icon>
                     </b-button>
                 </b-col>
@@ -243,6 +243,10 @@ export default {
             this.$bvModal.hide('modal-register')
             this.$bvModal.hide('modal-update')
             this.resetForm()
+        },
+        applyFilter(filterBy){
+            this.orderBooksDto.value = filterBy
+            this.getBooks()
         }
     },
     mounted() {
