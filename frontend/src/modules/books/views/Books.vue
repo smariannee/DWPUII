@@ -151,6 +151,9 @@ export default {
         return {
             slide: 0,
             sliding: null,
+            orderBooksDto:{
+                value:''
+            },
             form:{
                 id:null,
                 name:'',
@@ -174,7 +177,7 @@ export default {
             this.sliding = false
         },
         getBooks(){ 
-            instance.get('/books/getAll').then(response => {
+            instance.post('/books/getAll',this.orderBooksDto).then(response => {
                     this.books = response.data.data
                 })
                 .catch(error => {
