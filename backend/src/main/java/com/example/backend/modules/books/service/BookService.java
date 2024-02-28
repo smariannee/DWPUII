@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,7 +66,7 @@ public class BookService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseApi<Page<Book>> getPaged(Pageable pageable){
-        return new ResponseApi<>(iBookRepository.getAllPageable(pageable), HttpStatus.OK, false, "Books found successfully");
+    public ResponseApi<List<Book>> getAll(){
+        return new ResponseApi<>(iBookRepository.getAll(), HttpStatus.OK, false, "Books found successfully");
     }
 }
