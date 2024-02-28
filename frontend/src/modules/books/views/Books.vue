@@ -58,18 +58,19 @@
                     </b-button>
                 </b-col>
             </b-row>
-            <b-row>
+            <b-row class="mb-5">
                 <b-col cols="9">
                     <b-row>
                         <TransitionGroup name="fadeDown" tag="div" class="row">
                             <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
                                 <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
-                                    :title="book.name" style="height: 20rem;">
+                                    :title="book.name" style="height: 22.5rem;">
                                     <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
-                                    <b-card-text v-show="book.img != ''">
-                                        <b-img :src="book.img" class="img" alt="Imagen del libro" fluid rounded
-                                            center></b-img>
-                                    </b-card-text>
+                                    <hr>
+                                    <div class="d-flex justify-content-center align-items-center">
+                                        <b-card-img v-show="book.img" :src="book.img" class="img my-2"
+                                            alt="Imagen del libro" style="height: 180px; width: 100%;" fluid rounded center></b-card-img>
+                                    </div>
                                     <template #footer>
                                         <p class="mb-0">
                                             <b-icon icon="calendar"></b-icon>
@@ -84,19 +85,19 @@
                 <b-col cols="3" class="d-flex align-items-center">
                     <b-row>
                         <b-col cols="12" class="px-5">
-                            <b-button variant="success" class="w-100 py-3" v-b-modal.modal-register>
+                            <b-button variant="success" class="w-100 py-5" v-b-modal.modal-register>
                                 <span>Añadir libro</span>
                                 <b-icon icon="plus-circle" class="ms-2"></b-icon>
                             </b-button>
                         </b-col>
                         <b-col cols="12" class="px-5 mt-4 drag-container" @dragover.prevent @drop="handleDropUpdate">
-                            <b-button variant="warning" class="w-100 py-3">
+                            <b-button variant="warning" class="w-100 py-5">
                                 <span>Editar libro</span>
                                 <b-icon icon="pencil" class="ms-2"></b-icon>
                             </b-button>
                         </b-col>
                         <b-col cols="12" class="px-5 mt-4 drag-container" @dragover.prevent @drop="handleDropDelete">
-                            <b-button variant="danger" class="w-100 py-3">
+                            <b-button variant="danger" class="w-100 py-5">
                                 <span>Eliminar libro</span>
                                 <b-icon icon="trash" class="ms-2"></b-icon>
                             </b-button>
@@ -263,15 +264,15 @@ export default {
                             console.log(error)
                         })
                 }
-            }else{
+            } else {
                 instance.post('/books/', this.form).then(response => {
-                        this.getBooks()
-                        this.resetForm()
-                        this.closeModals()
+                    this.getBooks()
+                    this.resetForm()
+                    this.closeModals()
+                })
+                    .catch(error => {
+                        console.log(error)
                     })
-                        .catch(error => {
-                            console.log(error)
-                        })
             }
         },
         updateBook() {
