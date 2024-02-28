@@ -45,8 +45,8 @@
                     <b-row>
                         <TransitionGroup name="fadeDown" tag="div" class="row">
                             <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
-                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
-                                    :title="book.name" style="height: 22.5rem;">
+                                <b-card :key="book.id" draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
+                                    :title="book.name" style="height: 20rem;">
                                     <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
                                     <hr>
                                     <div class="d-flex justify-content-center align-items-center">
@@ -158,6 +158,12 @@
                             <b-form-input id="year" v-model="formUpdate.releaseDate" type="number" required></b-form-input>
                         </b-form-group>
                     </b-col>
+                    <b-col cols="12" class="mt-3">
+                        <b-img :src="showUpdateImg()" class="img" alt="Imagen seleccionada" fluid rounded center></b-img>
+                        <b-form-group label="Imagen del libro:" label-for="img">
+                            <b-form-file id="img" v-model="formUpdate.image"></b-form-file>
+                        </b-form-group>
+                    </b-col>
                     <b-col cols="6" class="mt-4 mb-2 d-flex align-items-center justify-content-center">
                         <b-button @click="updateBook()" variant="primary"
                             class="d-flex align-items-center justify-content-center" style="width: 90%;">
@@ -201,6 +207,8 @@ export default {
                 name: '',
                 autor: '',
                 releaseDate: '',
+                image: '',
+                img: ''
             },
             books: [{}],
             bookImages: []
@@ -261,14 +269,40 @@ export default {
             }
         },
         updateBook() {
-            instance.put('/books/', this.formUpdate).then(response => {
+            /* instance.put('/books/', this.formUpdate).then(response => {
                 this.getBooks()
                 this.resetForm()
                 this.closeModals()
             })
                 .catch(error => {
                     console.log(error)
+                }) */
+
+            if (this.formUpdate.image) {
+                const reader = new FileReader()
+                reader.readAsDataURL(this.formUpdate.image)
+                reader.onloadend = () => {
+                    this.formUpdate.img = reader.result
+
+                    instance.put('/books/', this.formUpdate).then(response => {
+                        this.getBooks()
+                        this.resetForm()
+                        this.closeModals()
+                    })
+                        .catch(error => {
+                            console.log(error)
+                        })
+                }
+            } else {
+                instance.put('/books/', this.formUpdate).then(response => {
+                    this.getBooks()
+                    this.resetForm()
+                    this.closeModals()
                 })
+                    .catch(error => {
+                        console.log(error)
+                    })
+            }
         },
         resetForm() {
             this.form.id = null
@@ -282,6 +316,8 @@ export default {
             this.formUpdate.name = ''
             this.formUpdate.autor = ''
             this.formUpdate.releaseDate = ''
+            this.formUpdate.image = ''
+            this.formUpdate.img = ''
         },
         closeModals() {
             this.$bvModal.hide('modal-register')
@@ -305,6 +341,10 @@ export default {
         showImg() {
             if (this.form.image) return URL.createObjectURL(this.form.image)
             return "https://cdn-icons-png.flaticon.com/512/1160/1160358.png"
+        },
+        showUpdateImg() {
+            if (this.formUpdate.image) return URL.createObjectURL(this.formUpdate.image)
+            return this.formUpdate.img
         }
     },
     mounted() {
