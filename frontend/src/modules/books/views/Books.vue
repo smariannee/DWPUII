@@ -4,8 +4,7 @@
             <b-row ref="carousel">
                 <b-col cols="12" class="px-0" v-show="showCarousel">
                     <b-carousel id="carousel-1" v-model="slide" :interval="4000" controls indicators background="#ababab"
-                        img-width="1024" img-height="480" style="text-shadow: 1px 1px 2px #333;"
-                        @sliding-start="onSlideStart" @sliding-end="onSlideEnd">
+                        img-width="1024" img-height="480" style="text-shadow: 1px 1px 2px #333;">
                         <!-- Text slides with image -->
                         <b-carousel-slide caption="First slide"
                             text="Nulla vitae elit libero, a pharetra augue mollis interdum."
@@ -63,7 +62,7 @@
                     <b-row>
                         <TransitionGroup name="fadeDown" tag="div" class="row">
                             <b-col v-for="book in books" :key="book.id" cols="12" sm="6" md="4" class="mt-4">
-                                <b-card draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
+                                <b-card :key="book.id" draggable="true" @dragstart="formUpdate = Object.assign({}, book)"
                                     :title="book.name" style="height: 20rem;">
                                     <b-card-sub-title class="mb-2 text-muted">{{ book.autor }}</b-card-sub-title>
                                     <b-card-text v-show="book.img != ''">
@@ -219,6 +218,8 @@ export default {
                 releaseDate: '',
             },
             books: [{}],
+            onSlideStart: null,
+            onSlideEnd: null
         }
     },
     methods: {
